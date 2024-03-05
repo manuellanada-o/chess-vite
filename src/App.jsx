@@ -4,7 +4,7 @@ import './App.css'
 import { Tile } from './components/Tile'
 import { Piece } from './components/Piece'
 
-import { PIECES, NULL, WHITE, BLACK, TIME_DIMENSION, BOARD_DIMENSION } from './constants'
+import { PIECES, NULL, WHITE, BLACK, TILE_DIMENSION, BOARD_DIMENSION } from './constants'
 const {
   PBK1, PBQ1, PBB1, PBB2, PBH1, PBH2, PBR1, PBR2, PBP1, PBP2, PBP3, PBP4, PBP5, PBP6, PBP7, PBP8,
   PWK1, PWQ1, PWB1, PWB2, PWH1, PWH2, PWR1, PWR2, PWP1, PWP2, PWP3, PWP4, PWP5, PWP6, PWP7, PWP8
@@ -18,35 +18,65 @@ const BOARD = [
   [ NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL ],
   [ NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL ],
   [ PWP1, PWP2, PWP3, PWP4, PWP5, PWP6, PWP7, PWP8 ],
-  [ PWR1, PWH1, PWB1, PWK1, PWQ1, PWB2, PWH2, PWR2 ]
+  [ PWR1, PWH1, PWB1, PWQ1, PWK1, PWB2, PWH2, PWR2 ]
 ]
 
 const App = () => {
-  const [selectedTile, setSelectedTile] = useState(NULL)
   const [selectedPos, setSelectedPos] = useState(NULL)
+  const [selectedTile, setSelectedTile] = useState(NULL)
+  const [nextMoveList, setNextMoveList] = useState([])
 
   const handleClick = (piece, posX, posY) => {
     console.log(`handleTileClick = { x: ${posX}, y: ${posY} }\n`)
-
     if (piece === selectedTile) return
 
     if (piece !== NULL) {
+      const pieceClass = piece.substring(2, 3)
+      const pieceColor = piece.substring(1, 2)
+      if (pieceClass === 'P') {
+        setNextMoveList([
+          { posX: pieceColor === 'B' ? posX+1 : posX-1, posY: posY+0},
+        ])
+      }
+      else if (pieceClass === 'H') {
+        let moveList = [
+          { posX: posX+2, posY: posY+1},
+          { posX: posX+2, posY: posY-1},
+          { posX: posX-2, posY: posY+1},
+          { posX: posX-2, posY: posY-1},
+          { posX: posX+1, posY: posY+2},
+          { posX: posX+1, posY: posY-2},
+          { posX: posX-1, posY: posY+2},
+          { posX: posX-1, posY: posY-2},
+        ]
+        moveList = moveList.filter(move => move.posX >= 0 && move.posX <= 7 && move.posY >= 0 && move.posY <= 7)
+        moveList = moveList.filter(move => pieceColor !== BOARD[move.posX][move.posY]?.substring(1, 2))
+        setNextMoveList(moveList)
+      }
       setSelectedTile(piece)
       setSelectedPos({ posX, posY })
     }
       
     if (selectedTile) {
-      BOARD[posX][posY] = selectedTile
-      BOARD[selectedPos.posX][selectedPos.posY] = NULL
-      setSelectedTile(NULL)
+      if (nextMoveList.find(next => next.posX === posX && next.posY === posY)) {
+        BOARD[posX][posY] = selectedTile
+        BOARD[selectedPos.posX][selectedPos.posY] = NULL
+        setSelectedTile(NULL)
+        setNextMoveList([])
+      }
     }
   }
 
-  const getBackgroundColor = (boardFlatIndex) => {
-    return parseInt(boardFlatIndex/8)%2===0 ? 
-      (boardFlatIndex%2===0 ? WHITE : BLACK) : 
-      (boardFlatIndex%2===0 ? BLACK : WHITE)
+  const getBackgroundColor = (index, posX, posY) => {
+    if (nextMoveList.find(next => next.posX === posX && next.posY === posY))
+    return 'lime'
+    return parseInt(index/8)%2===0 ? 
+      (index%2===0 ? WHITE : BLACK) : 
+      (index%2===0 ? BLACK : WHITE)
   }
+
+  const getPosX = (index) => parseInt(index/8)
+  const getPosY = (index) => index%8
 
   return (
     <>
@@ -57,10 +87,10 @@ const App = () => {
         {BOARD.flat().map((piece, index) =>
           <Tile
             key={index}
-            posX={parseInt(index/8)}
-            posY={index%8}
-            dimension={TIME_DIMENSION}
-            backgroundColor={getBackgroundColor(index)}
+            posX={getPosX(index)}
+            posY={getPosY(index)}
+            dimension={TILE_DIMENSION}
+            backgroundColor={getBackgroundColor(index, getPosX(index), getPosY(index))}
             piece={<Piece piece={piece}/>}
             handleClick={handleClick}
           />

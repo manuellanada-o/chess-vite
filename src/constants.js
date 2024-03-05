@@ -36,5 +36,5 @@ export const PIECES = {
 export const NULL = null
 export const WHITE = '#FFF'
 export const BLACK = '#777'
-export const TIME_DIMENSION = 80
-export const BOARD_DIMENSION = TIME_DIMENSION * 8
+export const TILE_DIMENSION = 80
+export const BOARD_DIMENSION = TILE_DIMENSION * 8
