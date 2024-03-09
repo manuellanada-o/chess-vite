@@ -21,6 +21,10 @@ const BOARD = [
   [ PWR1, PWH1, PWB1, PWQ1, PWK1, PWB2, PWH2, PWR2 ]
 ]
 
+import { getMoveListForHorse } from './rules/horse'
+import { getMoveListForPawn } from './rules/pawn'
+import { getMoveListForRook } from './rules/rook'
+
 const App = () => {
   const [selectedPos, setSelectedPos] = useState(NULL)
   const [selectedTile, setSelectedTile] = useState(NULL)
@@ -32,26 +36,14 @@ const App = () => {
 
     if (piece !== NULL) {
       const pieceClass = piece.substring(2, 3)
-      const pieceColor = piece.substring(1, 2)
       if (pieceClass === 'P') {
-        setNextMoveList([
-          { posX: pieceColor === 'B' ? posX+1 : posX-1, posY: posY+0},
-        ])
+        setNextMoveList(getMoveListForPawn(BOARD, piece, posX, posY))
       }
       else if (pieceClass === 'H') {
-        let moveList = [
-          { posX: posX+2, posY: posY+1},
-          { posX: posX+2, posY: posY-1},
-          { posX: posX-2, posY: posY+1},
-          { posX: posX-2, posY: posY-1},
-          { posX: posX+1, posY: posY+2},
-          { posX: posX+1, posY: posY-2},
-          { posX: posX-1, posY: posY+2},
-          { posX: posX-1, posY: posY-2},
-        ]
-        moveList = moveList.filter(move => move.posX >= 0 && move.posX <= 7 && move.posY >= 0 && move.posY <= 7)
-        moveList = moveList.filter(move => pieceColor !== BOARD[move.posX][move.posY]?.substring(1, 2))
-        setNextMoveList(moveList)
+        setNextMoveList(getMoveListForHorse(BOARD, piece, posX, posY))
+      }
+      else if (pieceClass === 'R') {
+        setNextMoveList(getMoveListForRook(BOARD, piece, posX, posY))
       }
       setSelectedTile(piece)
       setSelectedPos({ posX, posY })
@@ -64,6 +56,10 @@ const App = () => {
         setSelectedTile(NULL)
         setNextMoveList([])
       }
+    }
+    if (piece === NULL) {
+      setSelectedTile(NULL)
+      setNextMoveList([])
     }
   }
 
