@@ -24,6 +24,9 @@ const BOARD = [
 import { getMoveListForHorse } from './rules/horse'
 import { getMoveListForPawn } from './rules/pawn'
 import { getMoveListForRook } from './rules/rook'
+import { getMoveListForBishop } from './rules/bishop'
+import { getMoveListForQueen } from './rules/queen'
+import { getMoveListForKing } from './rules/king'
 
 const App = () => {
   const [selectedPos, setSelectedPos] = useState(NULL)
@@ -44,6 +47,15 @@ const App = () => {
       }
       else if (pieceClass === 'R') {
         setNextMoveList(getMoveListForRook(BOARD, piece, posX, posY))
+      }
+      else if (pieceClass === 'B') {
+        setNextMoveList(getMoveListForBishop(BOARD, piece, posX, posY))
+      }
+      else if (pieceClass === 'Q') {
+        setNextMoveList(getMoveListForQueen(BOARD, piece, posX, posY))
+      }
+      else if (pieceClass === 'K') {
+        setNextMoveList(getMoveListForKing(BOARD, piece, posX, posY))
       }
       setSelectedTile(piece)
       setSelectedPos({ posX, posY })
