@@ -21,12 +21,7 @@ const BOARD = [
   [ PWR1, PWH1, PWB1, PWQ1, PWK1, PWB2, PWH2, PWR2 ]
 ]
 
-import { getMoveListForHorse } from './rules/horse'
-import { getMoveListForPawn } from './rules/pawn'
-import { getMoveListForRook } from './rules/rook'
-import { getMoveListForBishop } from './rules/bishop'
-import { getMoveListForQueen } from './rules/queen'
-import { getMoveListForKing } from './rules/king'
+import { getNextMoveList } from './rules'
 
 const App = () => {
   const [selectedPos, setSelectedPos] = useState(NULL)
@@ -38,25 +33,7 @@ const App = () => {
     if (piece === selectedTile) return
 
     if (piece !== NULL) {
-      const pieceClass = piece.substring(2, 3)
-      if (pieceClass === 'P') {
-        setNextMoveList(getMoveListForPawn(BOARD, piece, posX, posY))
-      }
-      else if (pieceClass === 'H') {
-        setNextMoveList(getMoveListForHorse(BOARD, piece, posX, posY))
-      }
-      else if (pieceClass === 'R') {
-        setNextMoveList(getMoveListForRook(BOARD, piece, posX, posY))
-      }
-      else if (pieceClass === 'B') {
-        setNextMoveList(getMoveListForBishop(BOARD, piece, posX, posY))
-      }
-      else if (pieceClass === 'Q') {
-        setNextMoveList(getMoveListForQueen(BOARD, piece, posX, posY))
-      }
-      else if (pieceClass === 'K') {
-        setNextMoveList(getMoveListForKing(BOARD, piece, posX, posY))
-      }
+      setNextMoveList(getNextMoveList(BOARD, piece, posX, posY))
       setSelectedTile(piece)
       setSelectedPos({ posX, posY })
     }
@@ -90,7 +67,8 @@ const App = () => {
     <>
       <div style={{
         width: `${BOARD_DIMENSION}px`,
-        height: `${BOARD_DIMENSION}px`
+        height: `${BOARD_DIMENSION}px`,
+        backgroundColor: 'lime'
       }}>
         {BOARD.flat().map((piece, index) =>
           <Tile
